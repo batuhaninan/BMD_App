@@ -61,7 +61,7 @@ public class QueryController {
 		return clientRepository.findAll();
 	}
 
-	@GetMapping(path="/count/failed/")
+	@GetMapping(path="/count/failed/client")
 	public @ResponseBody Iterable<Client> getRequestErrorCountsPerClient (@RequestParam Integer  errorCode, @RequestParam String clientId){
 		// TODO: Parse JSON
 
