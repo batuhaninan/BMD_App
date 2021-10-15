@@ -26,26 +26,42 @@ public class ClientController {
 	RequestRepository requestRepository;
 
 	@PostMapping(path="/")
-	public @ResponseBody Iterable<Client> addNewClient (){
-		// TODO: Parse JSON
-
-		return clientRepository.findAll();
-	}
-
-	@DeleteMapping(path="/")
-	public @ResponseBody
-	Map<String, String> removeClientWithId (@RequestParam Integer id){
+	public @ResponseBody Map<String, String> addNewClient (@RequestBody String name, @RequestBody Long dailyMessageQuota){
 		HashMap<String, String> response = new HashMap<>();
-		Optional<Client> client = clientRepository.findById(id);
+		Client client = new Client(name, dailyMessageQuota);
 
-		if (client.isEmpty()) {
-			// TODO: Return approp. message
+		clientRepository.save(client);
+
+		Optional<Client> savedClient = clientRepository.findById(client.getId().intValue());
+
+		if (savedClient.isEmpty()) {
 			response.put("status", "failed");
 
 			return response;
 		}
 
 		response.put("status", "success");
+
+		return response;
+	}
+
+	@DeleteMapping(path="/")
+	public @ResponseBody
+	Map<String, String> removeClientWithId (@RequestParam Integer id){
+		HashMap<String, String> response = new HashMap<>();
+
+		Optional<Client> client = clientRepository.findById(id);
+
+		if (client.isEmpty()) {
+
+			response.put("status", "failed");
+
+			return response;
+		}
+
+		clientRepository.deleteById(id);
+		response.put("status", "success");
+
 		return response;
 	}
 
