@@ -4,12 +4,12 @@ import com.bmd_app.bmd_app.Entity.Client;
 import com.bmd_app.bmd_app.Repository.ClientRepository;
 import com.bmd_app.bmd_app.Repository.DeliveryRepository;
 import com.bmd_app.bmd_app.Repository.RequestRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -25,9 +25,12 @@ public class ClientController {
 	@Autowired
 	RequestRepository requestRepository;
 
+	@Autowired
+	ObjectMapper mapper;
+
 	@PostMapping(path="/")
-	public @ResponseBody Map<String, String> addNewClient (@RequestBody String name, @RequestBody Long dailyMessageQuota){
-		HashMap<String, String> response = new HashMap<>();
+	public @ResponseBody ObjectNode addNewClient (@RequestBody String name, @RequestBody Long dailyMessageQuota){
+		ObjectNode response = mapper.createObjectNode();
 		Client client = new Client(name, dailyMessageQuota);
 
 		clientRepository.save(client);
@@ -35,51 +38,45 @@ public class ClientController {
 		Optional<Client> savedClient = clientRepository.findById(client.getId().intValue());
 
 		if (savedClient.isEmpty()) {
-			response.put("status", "failed");
 
+			response.put("status", "failed");
 			return response;
 		}
 
 		response.put("status", "success");
-
 		return response;
 	}
 
 	@DeleteMapping(path="/")
 	public @ResponseBody
-	Map<String, String> removeClientWithId (@RequestParam Integer id){
-		HashMap<String, String> response = new HashMap<>();
+	ObjectNode removeClientWithId (@RequestParam Integer id){
+		ObjectNode response = mapper.createObjectNode();
 
 		Optional<Client> client = clientRepository.findById(id);
 
 		if (client.isEmpty()) {
 
 			response.put("status", "failed");
-
 			return response;
 		}
 
 		clientRepository.deleteById(id);
 		response.put("status", "success");
-
 		return response;
 	}
 
 	@GetMapping(path="/")
-	public @ResponseBody Optional<Client> getClient (@RequestParam Integer id){
-
+	public @ResponseBody ObjectNode getClient (@RequestParam Integer id){
+		ObjectNode response = mapper.createObjectNode();
 		Optional<Client> client = clientRepository.findById(id);
 
 		if (client.isEmpty()) {
-			// TODO: Return approp. message
 
-			return null;
+			response.put("status", "failed");
+			return response;
 		}
 
-		return client;
+		response.put("status", "success");
+		return response;
 	}
-
-
-
-
 }
