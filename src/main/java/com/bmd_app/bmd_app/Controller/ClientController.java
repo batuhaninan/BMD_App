@@ -39,7 +39,7 @@ public class ClientController {
 		Optional<Client> client = clientRepository.findById(id);
 
 		if (client.isEmpty()) {
-			// TODO: Return approp. message
+			// TODO: Return approp. message.
 			response.put("status", "failed");
 
 			return response;
