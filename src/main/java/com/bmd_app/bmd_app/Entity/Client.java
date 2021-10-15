@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "T_CLIENT")
 public class Client {
 
 	@Id
@@ -19,12 +20,16 @@ public class Client {
 	@Column(name = "DAILYMESSAGEQUOTA")
 	private Long dailyMessageQuota;
 
-	@OneToMany(mappedBy="request", fetch=FetchType.LAZY, orphanRemoval=false)
+	@OneToMany(mappedBy="client", fetch=FetchType.LAZY)
 	private List<Request> requestId = new ArrayList<>();
 
 	public Client(String name, Long dailyMessageQuota) {
 		this.name = name;
 		this.dailyMessageQuota = dailyMessageQuota;
+	}
+
+	public Client() {
+
 	}
 
 	public String getName() {

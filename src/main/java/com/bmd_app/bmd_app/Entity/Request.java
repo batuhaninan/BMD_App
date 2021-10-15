@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
+@Table(name = "T_REQUEST")
 public class Request {
 
 	@Id
@@ -28,10 +29,11 @@ public class Request {
 	@Column(name = "ENDTIME")
 	private Date endTime;
 
-	@Column(name = "CLIENTID")
-	private Long clientId;
+	@ManyToOne
+	@JoinColumn(name="CLIENT", nullable=false)
+	private Client client;
 
-	@OneToMany(mappedBy="delivery", fetch=FetchType.LAZY, orphanRemoval=false)
+	@OneToMany(mappedBy="request", fetch=FetchType.LAZY)
 	private List<Delivery> destinationNumbers = new ArrayList<>();
 
 	public List<Delivery> getDestinationNumbers() {
@@ -90,11 +92,11 @@ public class Request {
 		this.endTime = endTime;
 	}
 
-	public Long getClientId() {
-		return clientId;
+	public Client getClient() {
+		return client;
 	}
 
-	public void setClientId(Long clientId) {
-		this.clientId = clientId;
+	public void setClient(Client client) {
+		this.client = client;
 	}
 }
