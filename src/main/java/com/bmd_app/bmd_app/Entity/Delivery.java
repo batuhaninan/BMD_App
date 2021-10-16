@@ -23,6 +23,9 @@ public class Delivery {
 	@Column(name = "ISCANCELLED")
 	private Boolean isCancelled;
 
+	@Column(name = "RESULTCODE")
+	private Long resultCode;
+
 	public Boolean getCancelled() {
 		return isCancelled;
 	}
@@ -30,6 +33,14 @@ public class Delivery {
 	public void setCancelled(Boolean cancelled) {
 		isCancelled = cancelled;
 
+	}
+
+	public Long getResultCode() {
+		return resultCode;
+	}
+
+	public void setResultCode(Long resultCode) {
+		this.resultCode = resultCode;
 	}
 
 	public Long getId() {

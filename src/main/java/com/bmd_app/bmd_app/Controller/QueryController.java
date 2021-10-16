@@ -1,5 +1,6 @@
 package com.bmd_app.bmd_app.Controller;
 
+import com.bmd_app.bmd_app.Entity.Delivery;
 import com.bmd_app.bmd_app.Entity.Request;
 import com.bmd_app.bmd_app.Repository.ClientRepository;
 import com.bmd_app.bmd_app.Repository.DeliveryRepository;
@@ -39,13 +40,13 @@ public class QueryController {
 		Date startTime = formatter.parse((String) payload.get("startTime"));;
 		Date endTime = formatter.parse((String) payload.get("endTime"));;
 		int count = 0;
-		ArrayList<Request> requests = (ArrayList<Request>) requestRepository.findAll();
-		for (Request request : requests){
-			if (request.getResultCode() == -1){
+		ArrayList<Delivery> deliveries = (ArrayList<Delivery>) deliveryRepository.findAll();
+		for (Delivery delivery : deliveries){
+			if (delivery.getResultCode() == -1){
 				continue;
 			}
-			if (request.getStartTime().after(startTime)){
-				if (endTime.after(request.getEndTime())){
+			if (delivery.getRequest().getStartTime().after(startTime)){
+				if (endTime.after(delivery.getRequest().getEndTime())){
 					count++;
 				}
 			}
@@ -63,14 +64,14 @@ public class QueryController {
 		Date endTime = formatter.parse((String) payload.get("endTime"));;
 		int success = 0;
 		int failed = 0;
-		ArrayList<Request> requests = (ArrayList<Request>) requestRepository.findAll();
-		for (Request request : requests){
-			if (request.getResultCode() == -1){
+		ArrayList<Delivery> deliveries = (ArrayList<Delivery>) deliveryRepository.findAll();
+		for (Delivery delivery : deliveries){
+			if (delivery.getResultCode() == -1){
 				continue;
 			}
-			if (request.getStartTime().after(startTime)){
-				if (endTime.after(request.getEndTime())){
-					if (request.getResultCode() == 0 || request.getResultCode() == 200 ){
+			if (delivery.getRequest().getStartTime().after(startTime)){
+				if (endTime.after(delivery.getRequest().getEndTime())){
+					if (delivery.getResultCode() == 0 || delivery.getResultCode() == 200 ){
 						success++;
 					}
 					else{
@@ -91,22 +92,22 @@ public class QueryController {
 		ObjectNode response = mapper.createObjectNode();
 		Date startTime = formatter.parse((String) payload.get("startTime"));;
 		Date endTime = formatter.parse((String) payload.get("endTime"));;
-		ArrayList<Request> requests = (ArrayList<Request>) requestRepository.findAll();
-		for (Request request : requests){
-			if (request.getResultCode() == -1){
+		ArrayList<Delivery> deliveries = (ArrayList<Delivery>) deliveryRepository.findAll();
+		for (Delivery delivery : deliveries){
+			if (delivery.getResultCode() == -1){
 				continue;
 			}
-			if (request.getStartTime().after(startTime)){
-				if (endTime.after(request.getEndTime())){
-					if(request.getResultCode()!=0){ // fix request.getSuccess
-						if (Long.valueOf(request.getResultCode()).equals(null)){
+			if (delivery.getRequest().getStartTime().after(startTime)){
+				if (endTime.after(delivery.getRequest().getEndTime())){
+					if(delivery.getResultCode()!=0){ // fix request.getSuccess
+						if (Long.valueOf(delivery.getResultCode()).equals(null)){
 							continue;
 						}
-						if (errors.get(request.getResultCode()) != null) {
-							errors.put(request.getResultCode(), errors.get(request.getResultCode()) + 1);
+						if (errors.get(delivery.getResultCode()) != null) {
+							errors.put(delivery.getResultCode(), errors.get(delivery.getResultCode()) + 1);
 						}
 						else{
-							errors.put(request.getResultCode(), 1);
+							errors.put(delivery.getResultCode(), 1);
 						}
 					}
 				}
@@ -125,30 +126,30 @@ public class QueryController {
 		ObjectNode response = mapper.createObjectNode();
 		Date startTime = formatter.parse((String) payload.get("startTime"));;
 		Date endTime = formatter.parse((String) payload.get("endTime"));;
-		ArrayList<Request> requests = (ArrayList<Request>) requestRepository.findAll();
-		for (Request request : requests){
-			if (request.getResultCode() == -1){
+		ArrayList<Delivery> deliveries = (ArrayList<Delivery>) deliveryRepository.findAll();
+		for (Delivery delivery : deliveries){
+			if (delivery.getResultCode() == -1){
 				continue;
 			}
-			if (request.getStartTime().after(startTime)){
-				if (endTime.after(request.getEndTime())){
-					if(request.getResultCode()!=0){
+			if (delivery.getRequest().getStartTime().after(startTime)){
+				if (endTime.after(delivery.getRequest().getEndTime())){
+					if(delivery.getResultCode()!=0){
 						Hashtable<Long, Integer> innerMap = new Hashtable<Long, Integer>();
-						if(errors.get(request.getClient().getId())!=null){
-							if ( errors.get( request.getClient().getId() ).get( request.getResultCode() ) != null ){
-								innerMap = errors.get(request.getClient().getId());
-								innerMap.put(request.getResultCode(),errors.get(request.getClient().getId()).get(request.getResultCode())+1);
-								errors.put(request.getClient().getId(), innerMap);
+						if(errors.get(delivery.getRequest().getClient().getId())!=null){
+							if ( errors.get( delivery.getRequest().getClient().getId() ).get( delivery.getResultCode() ) != null ){
+								innerMap = errors.get(delivery.getRequest().getClient().getId());
+								innerMap.put(delivery.getResultCode(),errors.get(delivery.getRequest().getClient().getId()).get(delivery.getResultCode())+1);
+								errors.put(delivery.getRequest().getClient().getId(), innerMap);
 							}
 							else{
-								innerMap = errors.get(request.getClient().getId());
-								innerMap.put(request.getResultCode(), 1);
-								errors.put(request.getClient().getId(), innerMap);
+								innerMap = errors.get(delivery.getRequest().getClient().getId());
+								innerMap.put(delivery.getResultCode(), 1);
+								errors.put(delivery.getRequest().getClient().getId(), innerMap);
 							}
 						}
 						else{
-							innerMap.put(request.getResultCode(), 1);
-							errors.put(request.getClient().getId(), innerMap);
+							innerMap.put(delivery.getResultCode(), 1);
+							errors.put(delivery.getRequest().getClient().getId(), innerMap);
 						}
 
 					}

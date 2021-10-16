@@ -20,8 +20,7 @@ public class Request {
 	@Column(name = "MESSAGEBODY")
 	private String messageBody;
 
-	@Column(name = "RESULTCODE")
-	private Long resultCode;
+
 
 	@Column(name = "STARTTIME")
 	private Date startTime;
@@ -59,13 +58,7 @@ public class Request {
 		this.messageBody = messageBody;
 	}
 
-	public Long getResultCode() {
-		return resultCode;
-	}
 
-	public void setResultCode(Long resultCode) {
-		this.resultCode = resultCode;
-	}
 
 	public Date getStartTime() {
 		return startTime;

@@ -11,6 +11,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -56,6 +58,19 @@ public class MessageController {
 		ArrayList<Delivery> destinationNumbers = new ArrayList<Delivery>();
 		Optional<Client> client = clientRepository.findById(clientId);
 
+		ArrayList<Delivery> deliveries = deliveryRepository.findAllBySingleId(clientId);
+
+		Long messageLeft = client.get().getDailyMessageQuota();
+
+
+
+		for (Delivery delivery : deliveries){
+			Date deliveryTime = delivery.getRequest().getStartTime();
+			if (delivery.getRequest().getStartTime().compareTo(startTime) == 0){
+				messageLeft--;
+			}
+		}
+
 		if (messageBody.length() > 1024){
 			response.put("status","failed");
 			response.put("errorMessage","maximum message length can be 1024 characters");
@@ -76,14 +91,21 @@ public class MessageController {
 		request.setMessageBody(messageBody);
 		request.setStartTime(startTime);
 		request.setEndTime(endTime);
-		request.setResultCode(Long.valueOf(-1));
+
+		boolean flag = false;
 
 		for (Object destinationNumber : (ArrayList) payload.get("destinationNumbers")) {
+			if (messageLeft<=0){
+				flag = true;
+				break;
+			}
 			Delivery delivery = new Delivery();
 			delivery.setDestinationNumber((String) destinationNumber);
 			delivery.setSuccess(false);
 			delivery.setRequest(request);
 			delivery.setCancelled(false);
+			delivery.setResultCode(Long.valueOf(-1));
+
 
 			destinationNumbers.add(delivery);
 		}
@@ -96,7 +118,7 @@ public class MessageController {
 			Long resultCode = Long.valueOf(messageService.call(request, delivery));
 
 
-			request.setResultCode(resultCode);
+			delivery.setResultCode(resultCode);
 
 			delivery.setSuccess(resultCode <= 0);
 		}
@@ -104,8 +126,17 @@ public class MessageController {
 		requestRepository.save(request);
 		deliveryRepository.saveAll(destinationNumbers);
 
+		if (flag){
+
+			response.put("status", "failed");
+			response.put("errorMessage","Out of quota");
+			response.put("clientId", client.get().getId());
+			response.put("requestId", request.getId());
+			return response;
+		}
+
 		response.put("status", "success");
-		response.put("clientId", client.get().getId());
+		response.put("clientId", client.get().getId());	
 		response.put("requestId", request.getId());
 		return response;
 	}
