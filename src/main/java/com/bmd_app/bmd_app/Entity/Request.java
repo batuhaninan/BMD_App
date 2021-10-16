@@ -30,7 +30,7 @@ public class Request {
 	private Date endTime;
 
 	@ManyToOne
-	@JoinColumn(name="CLIENTE", nullable=false)
+	@JoinColumn(name="CLIENT", nullable=false)
 	private Client client;
 
 	@OneToMany(mappedBy="request", fetch=FetchType.LAZY)

@@ -4,7 +4,6 @@ import com.bmd_app.bmd_app.Entity.Client;
 import com.bmd_app.bmd_app.Repository.ClientRepository;
 import com.bmd_app.bmd_app.Repository.DeliveryRepository;
 import com.bmd_app.bmd_app.Repository.RequestRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -74,7 +73,7 @@ public class ClientController {
 	}
 
 	@GetMapping(path="/")
-	public @ResponseBody ObjectNode getClient (@RequestBody Map<String, Object> payload) throws JsonProcessingException {
+	public @ResponseBody ObjectNode getClient (@RequestBody Map<String, Object> payload){
 		ObjectNode response = mapper.createObjectNode();
 		Long id = Long.valueOf((Integer) payload.get("id"));
 		Optional<Client> client = clientRepository.findById(id);
@@ -86,9 +85,9 @@ public class ClientController {
 		}
 
 
-		String clientNode = mapper.writeValueAsString(client);
+		JsonNode clientNode = mapper.valueToTree(client);
 		response.put("status", "success");
-		response.put("data", clientNode);
+		response.set("data", clientNode);
 		return response;
 	}
 }
