@@ -4,11 +4,13 @@ import com.bmd_app.bmd_app.Entity.Client;
 import com.bmd_app.bmd_app.Repository.ClientRepository;
 import com.bmd_app.bmd_app.Repository.DeliveryRepository;
 import com.bmd_app.bmd_app.Repository.RequestRepository;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,45 +27,59 @@ public class ClientController {
 	@Autowired
 	RequestRepository requestRepository;
 
+	@Autowired
+	ObjectMapper mapper;
+
 	@PostMapping(path="/")
-	public @ResponseBody Iterable<Client> addNewClient (){
-		// TODO: Parse JSON
+	public @ResponseBody ObjectNode addNewClient (@RequestBody Map<String, Object> payload){
+		ObjectNode response = mapper.createObjectNode();
 
-		return clientRepository.findAll();
-	}
+		String name = (String) payload.get("name");
+		Long dailyMessageQuota = Long.valueOf((Integer) payload.get("dailyMessageQuota"));
 
-	@DeleteMapping(path="/")
-	public @ResponseBody
-	Map<String, String> removeClientWithId (@RequestParam Integer id){
-		HashMap<String, String> response = new HashMap<>();
-		Optional<Client> client = clientRepository.findById(id);
+		Client client = new Client(name, dailyMessageQuota);
 
-		if (client.isEmpty()) {
-			// TODO: Return approp. message.
-			response.put("status", "failed");
-
-			return response;
-		}
+		clientRepository.save(client);
 
 		response.put("status", "success");
 		return response;
 	}
 
-	@GetMapping(path="/")
-	public @ResponseBody Optional<Client> getClient (@RequestParam Integer id){
+	@DeleteMapping(path="/")
+	public @ResponseBody
+	ObjectNode removeClientWithId (@RequestBody Map<String, Object> payload){
+		ObjectNode response = mapper.createObjectNode();
+		Long id = (Long) payload.get("id");
 
 		Optional<Client> client = clientRepository.findById(id);
 
 		if (client.isEmpty()) {
-			// TODO: Return approp. message
 
-			return null;
+			response.put("status", "failed");
+			return response;
 		}
 
-		return client;
+		clientRepository.deleteById(id);
+		response.put("status", "success");
+		return response;
 	}
 
+	@GetMapping(path="/")
+	public @ResponseBody ObjectNode getClient (@RequestBody Map<String, Object> payload){
+		ObjectNode response = mapper.createObjectNode();
+		Long id = Long.valueOf((Integer) payload.get("id"));
+		Optional<Client> client = clientRepository.findById(id);
+
+		if (client.isEmpty()) {
+
+			response.put("status", "failed");
+			return response;
+		}
 
 
-
+		JsonNode clientNode = mapper.valueToTree(client);
+		response.put("status", "success");
+		response.set("data", clientNode);
+		return response;
+	}
 }
