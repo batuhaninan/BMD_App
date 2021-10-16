@@ -54,8 +54,9 @@ public class ClientController {
 
 	@DeleteMapping(path="/")
 	public @ResponseBody
-	ObjectNode removeClientWithId (@RequestParam Integer id){
+	ObjectNode removeClientWithId (@RequestBody Map<String, Object> payload){
 		ObjectNode response = mapper.createObjectNode();
+		Integer id = (Integer) payload.get("id");
 
 		Optional<Client> client = clientRepository.findById(id);
 
@@ -71,8 +72,9 @@ public class ClientController {
 	}
 
 	@GetMapping(path="/")
-	public @ResponseBody ObjectNode getClient (@RequestParam Integer id){
+	public @ResponseBody ObjectNode getClient (@RequestBody Map<String, Object> payload){
 		ObjectNode response = mapper.createObjectNode();
+		Integer id = (Integer) payload.get("id");
 		Optional<Client> client = clientRepository.findById(id);
 
 		if (client.isEmpty()) {

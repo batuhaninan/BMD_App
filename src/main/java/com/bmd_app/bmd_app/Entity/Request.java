@@ -21,7 +21,7 @@ public class Request {
 	private String messageBody;
 
 	@Column(name = "ISSUCCESS")
-	private Boolean isSuccess;
+	private int resultCode;
 
 	@Column(name = "STARTTIME")
 	private Date startTime;
@@ -68,12 +68,12 @@ public class Request {
 		this.messageBody = messageBody;
 	}
 
-	public Boolean getSuccess() {
-		return isSuccess;
+	public int getResultCode() {
+		return resultCode;
 	}
 
-	public void setSuccess(Boolean success) {
-		isSuccess = success;
+	public void setResultCode(int resultCode) {
+		this.resultCode = resultCode;
 	}
 
 	public Date getStartTime() {
