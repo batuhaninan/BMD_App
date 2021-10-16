@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 
 @Controller
 @RequestMapping(path="/api/query")
@@ -31,8 +32,10 @@ public class QueryController {
 	ObjectMapper mapper;
 
 	@GetMapping(path="/count/request")
-	public @ResponseBody ObjectNode getRequestCount (@RequestBody Date startTime, @RequestBody Date endTime){
+	public @ResponseBody ObjectNode getRequestCount (@RequestBody Map<String, Object> payload){
 		ObjectNode response = mapper.createObjectNode();
+		Date startTime = (Date) payload.get("startTime");
+		Date endTime = (Date) payload.get("endTime");
 		int count = 0;
 		ArrayList<Request> requests = (ArrayList<Request>) requestRepository.findAll();
 		for (Request request : requests){
@@ -48,24 +51,47 @@ public class QueryController {
 	}
 
 	@GetMapping(path="/count/stats")
-	public @ResponseBody Iterable<Client> getRequestStats (){
+	public @ResponseBody ObjectNode getRequestStats (@RequestBody Map<String, Object> payload){
 		// TODO: Parse JSON
-
-		return clientRepository.findAll();
+		ObjectNode response = mapper.createObjectNode();
+		Date startTime = (Date) payload.get("startTime");
+		Date endTime = (Date) payload.get("endTime");
+		int success = 0;
+		int failed = 0;
+		ArrayList<Request> requests = (ArrayList<Request>) requestRepository.findAll();
+		for (Request request : requests){
+			if (request.getStartTime().after(startTime)){
+				if (endTime.after(request.getEndTime())){
+					if (request.getSuccess()){
+						success++;
+					}
+					else{
+						failed++;
+					}
+				}
+			}
+		}
+		response.put("status","success");
+		response.put("success", success);
+		response.put("failed",failed);
+		return response;
 	}
 
 	@GetMapping(path="/count/failed/")
-	public @ResponseBody Iterable<Client> getRequestErrorCounts (@RequestParam Integer errorCode){
-		// TODO: Parse JSON
+	public @ResponseBody ObjectNode getRequestErrorCounts (@RequestParam Integer errorCode){
+		ObjectNode response = mapper.createObjectNode();
 
-		return clientRepository.findAll();
+
+		return response;
 	}
 
 	@GetMapping(path="/count/failed/client")
-	public @ResponseBody Iterable<Client> getRequestErrorCountsPerClient (@RequestParam Integer  errorCode, @RequestParam String clientId){
+	public @ResponseBody ObjectNode getRequestErrorCountsPerClient (@RequestParam Integer  errorCode, @RequestParam String clientId){
 		// TODO: Parse JSON
+		ObjectNode response = mapper.createObjectNode();
 
-		return clientRepository.findAll();
+
+		return response;
 	}
 
 
