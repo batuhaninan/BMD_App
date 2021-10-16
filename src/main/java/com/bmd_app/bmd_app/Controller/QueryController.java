@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +37,7 @@ public class QueryController {
 	SimpleDateFormat formatter = new SimpleDateFormat("dd-mm-yyyy", Locale.ENGLISH);
 
 	@GetMapping(path="/count/request")
-	public @ResponseBody ObjectNode getRequestCount (@RequestBody Map<String, Object> payload) throws ParseException {
+	public ResponseEntity<Object> getRequestCount (@RequestBody Map<String, Object> payload) throws ParseException {
 		ObjectNode response = mapper.createObjectNode();
 		Date startTime = formatter.parse((String) payload.get("startTime"));;
 		Date endTime = formatter.parse((String) payload.get("endTime"));;
@@ -53,11 +55,11 @@ public class QueryController {
 		}
 		response.put("status","success");
 		response.put("count",count);
-		return response;
+		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
 
 	@GetMapping(path="/count/stats")
-	public @ResponseBody ObjectNode getRequestStats (@RequestBody Map<String, Object> payload) throws ParseException {
+	public ResponseEntity<Object> getRequestStats (@RequestBody Map<String, Object> payload) throws ParseException {
 		// TODO: Parse JSON
 		ObjectNode response = mapper.createObjectNode();
 		Date startTime = formatter.parse((String) payload.get("startTime"));;
@@ -81,13 +83,13 @@ public class QueryController {
 			}
 		}
 		response.put("status","success");
-		response.put("success", success);
-		response.put("failed",failed);
-		return response;
+		response.put("successCount", success);
+		response.put("failCount",failed);
+		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
 
 	@GetMapping(path="/count/failed/")
-	public @ResponseBody ObjectNode getRequestErrorCounts (@RequestBody Map<String, Object> payload) throws ParseException {
+	public ResponseEntity<Object> getRequestErrorCounts (@RequestBody Map<String, Object> payload) throws ParseException {
 		Hashtable<Long, Integer> errors = new Hashtable<Long, Integer>();
 		ObjectNode response = mapper.createObjectNode();
 		Date startTime = formatter.parse((String) payload.get("startTime"));;
@@ -116,11 +118,11 @@ public class QueryController {
 		JsonNode node = mapper.valueToTree(errors);
 		response.put("status","success");
 		response.set("data",node);
-		return response;
+		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
 
 	@GetMapping(path="/count/failed/client")
-	public @ResponseBody ObjectNode getRequestErrorCountsPerClient (@RequestBody Map<String, Object> payload) throws ParseException {
+	public ResponseEntity<Object> getRequestErrorCountsPerClient (@RequestBody Map<String, Object> payload) throws ParseException {
 		// TODO: Parse JSON
 		Hashtable<Long,Hashtable<Long, Integer>> errors = new Hashtable<Long, Hashtable<Long, Integer>>();
 		ObjectNode response = mapper.createObjectNode();
@@ -159,7 +161,7 @@ public class QueryController {
 		JsonNode node = mapper.valueToTree(errors);
 		response.put("status","success");
 		response.set("data",node);
-		return response;
+		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
 
 

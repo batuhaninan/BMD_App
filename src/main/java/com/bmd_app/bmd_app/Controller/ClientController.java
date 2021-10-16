@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +33,7 @@ public class ClientController {
 	ObjectMapper mapper;
 
 	@PostMapping(path="/")
-	public @ResponseBody ObjectNode addNewClient (@RequestBody Map<String, Object> payload){
+	public ResponseEntity<Object> addNewClient (@RequestBody Map<String, Object> payload){
 		ObjectNode response = mapper.createObjectNode();
 
 		String name = (String) payload.get("name");
@@ -42,12 +44,11 @@ public class ClientController {
 		clientRepository.save(client);
 
 		response.put("status", "success");
-		return response;
+		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
 
 	@DeleteMapping(path="/")
-	public @ResponseBody
-	ObjectNode removeClientWithId (@RequestBody Map<String, Object> payload){
+	public ResponseEntity<Object> removeClientWithId (@RequestBody Map<String, Object> payload){
 		ObjectNode response = mapper.createObjectNode();
 		Long id = (Long) payload.get("id");
 
@@ -56,16 +57,16 @@ public class ClientController {
 		if (client.isEmpty()) {
 
 			response.put("status", "failed");
-			return response;
+			return new ResponseEntity<Object>(response, HttpStatus.NOT_FOUND);
 		}
 
 		clientRepository.deleteById(id);
 		response.put("status", "success");
-		return response;
+		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
 
 	@GetMapping(path="/")
-	public @ResponseBody ObjectNode getClient (@RequestBody Map<String, Object> payload){
+	public ResponseEntity<Object> getClient (@RequestBody Map<String, Object> payload){
 		ObjectNode response = mapper.createObjectNode();
 		Long id = Long.valueOf((Integer) payload.get("id"));
 		Optional<Client> client = clientRepository.findById(id);
@@ -73,13 +74,13 @@ public class ClientController {
 		if (client.isEmpty()) {
 
 			response.put("status", "failed");
-			return response;
+			return new ResponseEntity<Object>(response, HttpStatus.NOT_FOUND);
 		}
 
 
 		JsonNode clientNode = mapper.valueToTree(client);
 		response.put("status", "success");
 		response.set("data", clientNode);
-		return response;
+		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
 }
