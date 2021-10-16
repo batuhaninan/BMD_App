@@ -33,16 +33,7 @@ public class Request {
 	@JoinColumn(name="CLIENT", nullable=false)
 	private Client client;
 
-	@OneToMany(mappedBy="request", fetch=FetchType.LAZY)
-	private List<Delivery> destinationNumbers = new ArrayList<>();
 
-	public List<Delivery> getDestinationNumbers() {
-		return destinationNumbers;
-	}
-
-	public void setDestinationNumbers(List<Delivery> destinationNumbers) {
-		this.destinationNumbers = destinationNumbers;
-	}
 
 	public Long getId() {
 		return id;

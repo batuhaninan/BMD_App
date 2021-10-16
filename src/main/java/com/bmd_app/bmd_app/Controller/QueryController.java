@@ -41,6 +41,9 @@ public class QueryController {
 		int count = 0;
 		ArrayList<Request> requests = (ArrayList<Request>) requestRepository.findAll();
 		for (Request request : requests){
+			if (request.getResultCode() == -1){
+				continue;
+			}
 			if (request.getStartTime().after(startTime)){
 				if (endTime.after(request.getEndTime())){
 					count++;
@@ -62,6 +65,9 @@ public class QueryController {
 		int failed = 0;
 		ArrayList<Request> requests = (ArrayList<Request>) requestRepository.findAll();
 		for (Request request : requests){
+			if (request.getResultCode() == -1){
+				continue;
+			}
 			if (request.getStartTime().after(startTime)){
 				if (endTime.after(request.getEndTime())){
 					if (request.getResultCode() == 0 || request.getResultCode() == 200 ){
@@ -87,6 +93,9 @@ public class QueryController {
 		Date endTime = formatter.parse((String) payload.get("endTime"));;
 		ArrayList<Request> requests = (ArrayList<Request>) requestRepository.findAll();
 		for (Request request : requests){
+			if (request.getResultCode() == -1){
+				continue;
+			}
 			if (request.getStartTime().after(startTime)){
 				if (endTime.after(request.getEndTime())){
 					if(request.getResultCode()!=0){ // fix request.getSuccess
@@ -118,6 +127,9 @@ public class QueryController {
 		Date endTime = formatter.parse((String) payload.get("endTime"));;
 		ArrayList<Request> requests = (ArrayList<Request>) requestRepository.findAll();
 		for (Request request : requests){
+			if (request.getResultCode() == -1){
+				continue;
+			}
 			if (request.getStartTime().after(startTime)){
 				if (endTime.after(request.getEndTime())){
 					if(request.getResultCode()!=0){

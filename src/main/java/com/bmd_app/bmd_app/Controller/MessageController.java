@@ -7,12 +7,14 @@ import com.bmd_app.bmd_app.Repository.ClientRepository;
 import com.bmd_app.bmd_app.Repository.DeliveryRepository;
 import com.bmd_app.bmd_app.Repository.RequestRepository;
 import com.bmd_app.bmd_app.Service.MessageService;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -52,6 +54,13 @@ public class MessageController {
 		ArrayList<Delivery> destinationNumbers = new ArrayList<Delivery>();
 		Optional<Client> client = clientRepository.findById(clientId);
 
+		if (messageBody.length() > 1024){
+			response.put("status","failed");
+			response.put("errorMessage","maximum message length can be 1024 characters");
+
+			return response;
+		}
+
 		if (client.isEmpty()) {
 			response.put("status", "failed");
 			response.put("errorMessage", "Cannot find client");
@@ -72,13 +81,18 @@ public class MessageController {
 			delivery.setDestinationNumber((String) destinationNumber);
 			delivery.setSuccess(false);
 			delivery.setRequest(request);
+			delivery.setCancelled(false);
 
 			destinationNumbers.add(delivery);
 		}
-		request.setDestinationNumbers(destinationNumbers);
 
-		for (Delivery delivery : request.getDestinationNumbers()) {
+		for (Delivery delivery : destinationNumbers) {
+			if (delivery.getCancelled()){
+				continue;
+			}
+
 			Long resultCode = Long.valueOf(messageService.call(request, delivery));
+
 
 			request.setResultCode(resultCode);
 
@@ -86,7 +100,7 @@ public class MessageController {
 		}
 
 		requestRepository.save(request);
-		deliveryRepository.saveAll(request.getDestinationNumbers());
+		deliveryRepository.saveAll(destinationNumbers);
 
 		response.put("status", "success");
 		response.put("clientId", client.get().getId());
@@ -94,5 +108,26 @@ public class MessageController {
 		return response;
 	}
 
+	@PutMapping(path="/cancel")
+	public @ResponseBody ObjectNode cancelDelivery (@RequestBody Map<String, Object> payload) throws ParseException{
+
+		ObjectNode response = mapper.createObjectNode();
+
+		Long requestId = Long.valueOf((Integer) payload.get("requestId"));
+		String destinationNumber = (String) payload.get("destinationNumber");
+		ArrayList<Delivery> deliveries = (ArrayList<Delivery>) deliveryRepository.findAll();
+		for (Delivery delivery : deliveries){
+			if (Objects.equals(delivery.getDestinationNumber(), destinationNumber) && Objects.equals(delivery.getRequest().getId(), requestId)){
+				delivery.setCancelled(true);
+				deliveryRepository.save(delivery);
+			}
+		}
+		response.put("status", "success");
+		return response;
+
+
+
+
+	}
 
 }
