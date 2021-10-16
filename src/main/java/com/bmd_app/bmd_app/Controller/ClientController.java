@@ -41,14 +41,6 @@ public class ClientController {
 
 		clientRepository.save(client);
 
-		//Optional<Client> savedClient = clientRepository.findById(client.getId().intValue());
-
-		//if (savedClient.isEmpty()) {
-
-			//response.put("status", "failed");
-			//return response;
-		//}
-
 		response.put("status", "success");
 		return response;
 	}

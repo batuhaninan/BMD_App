@@ -11,8 +11,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.lang.reflect.Array;
 import java.text.ParseException;
@@ -113,14 +115,29 @@ public class MessageController {
 
 		ObjectNode response = mapper.createObjectNode();
 
+		Boolean requestFlag = false;
+		Boolean destinationFlag = false;
+
 		Long requestId = Long.valueOf((Integer) payload.get("requestId"));
 		String destinationNumber = (String) payload.get("destinationNumber");
+
 		ArrayList<Delivery> deliveries = (ArrayList<Delivery>) deliveryRepository.findAll();
+
 		for (Delivery delivery : deliveries){
-			if (Objects.equals(delivery.getDestinationNumber(), destinationNumber) && Objects.equals(delivery.getRequest().getId(), requestId)){
-				delivery.setCancelled(true);
-				deliveryRepository.save(delivery);
+			if (Objects.equals(delivery.getRequest().getId(), requestId)){
+				requestFlag = true;
+				if (Objects.equals(delivery.getDestinationNumber(), destinationNumber)){
+					destinationFlag = true;
+					delivery.setCancelled(true);
+					deliveryRepository.save(delivery);
+				}
 			}
+		}
+		if (!requestFlag){
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid Parameter : requestId");
+		}
+		if (!destinationFlag){
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid Parameter : destinationNumber");
 		}
 		response.put("status", "success");
 		return response;
