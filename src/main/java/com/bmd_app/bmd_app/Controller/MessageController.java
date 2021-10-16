@@ -94,6 +94,7 @@ public class MessageController {
 
 		boolean flag = false;
 
+		Integer counter = 0;
 		for (Object destinationNumber : (ArrayList) payload.get("destinationNumbers")) {
 			if (messageLeft<=0){
 				flag = true;
@@ -106,8 +107,9 @@ public class MessageController {
 			delivery.setCancelled(false);
 			delivery.setResultCode(Long.valueOf(-1));
 
-
 			destinationNumbers.add(delivery);
+			messageLeft--;
+			counter++;
 		}
 
 		for (Delivery delivery : destinationNumbers) {
@@ -129,14 +131,14 @@ public class MessageController {
 		if (flag){
 
 			response.put("status", "failed");
-			response.put("errorMessage","Out of quota");
+			response.put("errorMessage","Out of quota, delivered message count: " + counter);
 			response.put("clientId", client.get().getId());
 			response.put("requestId", request.getId());
 			return response;
 		}
 
 		response.put("status", "success");
-		response.put("clientId", client.get().getId());	
+		response.put("clientId", client.get().getId());
 		response.put("requestId", request.getId());
 		return response;
 	}
