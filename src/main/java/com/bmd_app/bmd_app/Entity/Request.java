@@ -20,8 +20,8 @@ public class Request {
 	@Column(name = "MESSAGEBODY")
 	private String messageBody;
 
-	@Column(name = "ISSUCCESS")
-	private int resultCode;
+	@Column(name = "RESULTCODE")
+	private Long resultCode;
 
 	@Column(name = "STARTTIME")
 	private Date startTime;
@@ -30,7 +30,7 @@ public class Request {
 	private Date endTime;
 
 	@ManyToOne
-	@JoinColumn(name="CLIENT", nullable=false)
+	@JoinColumn(name="CLIENTE", nullable=false)
 	private Client client;
 
 	@OneToMany(mappedBy="request", fetch=FetchType.LAZY)
@@ -68,11 +68,11 @@ public class Request {
 		this.messageBody = messageBody;
 	}
 
-	public int getResultCode() {
+	public Long getResultCode() {
 		return resultCode;
 	}
 
-	public void setResultCode(int resultCode) {
+	public void setResultCode(Long resultCode) {
 		this.resultCode = resultCode;
 	}
 

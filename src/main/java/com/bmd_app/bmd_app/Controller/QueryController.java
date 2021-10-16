@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Controller
@@ -29,11 +31,13 @@ public class QueryController {
 	@Autowired
 	ObjectMapper mapper;
 
+	SimpleDateFormat formatter = new SimpleDateFormat("dd-mm-yyyy", Locale.ENGLISH);
+
 	@GetMapping(path="/count/request")
-	public @ResponseBody ObjectNode getRequestCount (@RequestBody Map<String, Object> payload){
+	public @ResponseBody ObjectNode getRequestCount (@RequestBody Map<String, Object> payload) throws ParseException {
 		ObjectNode response = mapper.createObjectNode();
-		Date startTime = (Date) payload.get("startTime");
-		Date endTime = (Date) payload.get("endTime");
+		Date startTime = formatter.parse((String) payload.get("startTime"));;
+		Date endTime = formatter.parse((String) payload.get("endTime"));;
 		int count = 0;
 		ArrayList<Request> requests = (ArrayList<Request>) requestRepository.findAll();
 		for (Request request : requests){
@@ -49,11 +53,11 @@ public class QueryController {
 	}
 
 	@GetMapping(path="/count/stats")
-	public @ResponseBody ObjectNode getRequestStats (@RequestBody Map<String, Object> payload){
+	public @ResponseBody ObjectNode getRequestStats (@RequestBody Map<String, Object> payload) throws ParseException {
 		// TODO: Parse JSON
 		ObjectNode response = mapper.createObjectNode();
-		Date startTime = (Date) payload.get("startTime");
-		Date endTime = (Date) payload.get("endTime");
+		Date startTime = formatter.parse((String) payload.get("startTime"));;
+		Date endTime = formatter.parse((String) payload.get("endTime"));;
 		int success = 0;
 		int failed = 0;
 		ArrayList<Request> requests = (ArrayList<Request>) requestRepository.findAll();
@@ -76,17 +80,17 @@ public class QueryController {
 	}
 
 	@GetMapping(path="/count/failed/")
-	public @ResponseBody ObjectNode getRequestErrorCounts (@RequestBody Map<String, Object> payload){
-		Hashtable<Integer, Integer> errors = new Hashtable<Integer, Integer>();
+	public @ResponseBody ObjectNode getRequestErrorCounts (@RequestBody Map<String, Object> payload) throws ParseException {
+		Hashtable<Long, Integer> errors = new Hashtable<Long, Integer>();
 		ObjectNode response = mapper.createObjectNode();
-		Date startTime = (Date) payload.get("startTime");
-		Date endTime = (Date) payload.get("endTime");
+		Date startTime = formatter.parse((String) payload.get("startTime"));;
+		Date endTime = formatter.parse((String) payload.get("endTime"));;
 		ArrayList<Request> requests = (ArrayList<Request>) requestRepository.findAll();
 		for (Request request : requests){
 			if (request.getStartTime().after(startTime)){
 				if (endTime.after(request.getEndTime())){
 					if(request.getResultCode()!=0){ // fix request.getSuccess
-						if (Integer.valueOf(request.getResultCode()).equals(null)){
+						if (Long.valueOf(request.getResultCode()).equals(null)){
 							continue;
 						}
 						if (errors.get(request.getResultCode()) != null) {
@@ -106,18 +110,18 @@ public class QueryController {
 	}
 
 	@GetMapping(path="/count/failed/client")
-	public @ResponseBody ObjectNode getRequestErrorCountsPerClient (@RequestBody Map<String, Object> payload){
+	public @ResponseBody ObjectNode getRequestErrorCountsPerClient (@RequestBody Map<String, Object> payload) throws ParseException {
 		// TODO: Parse JSON
-		Hashtable<Long,Hashtable<Integer, Integer>> errors = new Hashtable<Long, Hashtable<Integer, Integer>>();
+		Hashtable<Long,Hashtable<Long, Integer>> errors = new Hashtable<Long, Hashtable<Long, Integer>>();
 		ObjectNode response = mapper.createObjectNode();
-		Date startTime = (Date) payload.get("startTime");
-		Date endTime = (Date) payload.get("endTime");
+		Date startTime = formatter.parse((String) payload.get("startTime"));;
+		Date endTime = formatter.parse((String) payload.get("endTime"));;
 		ArrayList<Request> requests = (ArrayList<Request>) requestRepository.findAll();
 		for (Request request : requests){
 			if (request.getStartTime().after(startTime)){
 				if (endTime.after(request.getEndTime())){
 					if(request.getResultCode()!=0){
-						Hashtable<Integer, Integer> innerMap = new Hashtable<Integer, Integer>();
+						Hashtable<Long, Integer> innerMap = new Hashtable<Long, Integer>();
 						if(errors.get(request.getClient().getId())!=null){
 							if ( errors.get( request.getClient().getId() ).get( request.getResultCode() ) != null ){
 								innerMap = errors.get(request.getClient().getId());
@@ -131,7 +135,6 @@ public class QueryController {
 							}
 						}
 						else{
-							innerMap = errors.get(request.getClient().getId());
 							innerMap.put(request.getResultCode(), 1);
 							errors.put(request.getClient().getId(), innerMap);
 						}

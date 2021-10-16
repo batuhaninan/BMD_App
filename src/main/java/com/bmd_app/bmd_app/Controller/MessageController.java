@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Controller
@@ -32,7 +31,7 @@ public class MessageController {
 	RequestRepository requestRepository;
 
 	@Autowired
-	MessageService messageService;
+	MessageService messageService = new MessageService();
 
 	@Autowired
 	ObjectMapper mapper;
@@ -44,14 +43,14 @@ public class MessageController {
 	public @ResponseBody
 	ObjectNode sendMessage (@RequestBody Map<String, Object> payload) throws ParseException {
 		ObjectNode response = mapper.createObjectNode();
-		Integer clientId = (Integer) payload.get("clientId");
+		Long clientId = Long.valueOf((Integer) payload.get("clientId"));
 		String senderAddress = (String) payload.get("senderAddress");
 		String messageBody = (String) payload.get("messageBody");
 		Date startTime = formatter.parse((String) payload.get("startTime"));
 		Date endTime = formatter.parse((String) payload.get("endTime"));
 
 		ArrayList<Delivery> destinationNumbers = new ArrayList<Delivery>();
-		Optional<Client> client = clientRepository.findById((int) clientId.longValue());
+		Optional<Client> client = clientRepository.findById(clientId);
 
 		if (client.isEmpty()) {
 			response.put("status", "failed");
@@ -66,7 +65,7 @@ public class MessageController {
 		request.setMessageBody(messageBody);
 		request.setStartTime(startTime);
 		request.setEndTime(endTime);
-		request.setResultCode(-1);
+		request.setResultCode(Long.valueOf(-1));
 
 		for (Object destinationNumber : (ArrayList) payload.get("destinationNumbers")) {
 			Delivery delivery = new Delivery();
@@ -79,15 +78,15 @@ public class MessageController {
 		request.setDestinationNumbers(destinationNumbers);
 
 		for (Delivery delivery : request.getDestinationNumbers()) {
-			Integer resultCode = messageService.call(request, delivery);
+			Long resultCode = Long.valueOf(messageService.call(request, delivery));
 
 			request.setResultCode(resultCode);
 
 			delivery.setSuccess(resultCode <= 0);
-			deliveryRepository.save(delivery);
 		}
 
 		requestRepository.save(request);
+		deliveryRepository.saveAll(request.getDestinationNumbers());
 
 		response.put("status", "success");
 		response.put("clientId", client.get().getId());

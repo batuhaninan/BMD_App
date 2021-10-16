@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class MessageService {
 
-	MessageServiceCenter messageServiceCenter;
+	MessageServiceCenter messageServiceCenter = new MessageServiceCenter();
 
 	public Integer call (Request request, Delivery delivery) {
 
@@ -15,9 +15,7 @@ public class MessageService {
 		String destinationNumber = delivery.getDestinationNumber();
 		String messageBody = request.getMessageBody();
 
-		Integer resultCode = messageServiceCenter.submitMessage(senderAddress, destinationNumber, messageBody);
-
-		return resultCode;
+		return messageServiceCenter.submitMessage(senderAddress, destinationNumber, messageBody);
 	}
 
 

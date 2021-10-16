@@ -4,6 +4,8 @@ import com.bmd_app.bmd_app.Entity.Client;
 import com.bmd_app.bmd_app.Repository.ClientRepository;
 import com.bmd_app.bmd_app.Repository.DeliveryRepository;
 import com.bmd_app.bmd_app.Repository.RequestRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +36,9 @@ public class ClientController {
 		ObjectNode response = mapper.createObjectNode();
 
 		String name = (String) payload.get("name");
-		Integer dailyMessageQuota = (Integer) payload.get("dailyMessageQuota");
+		Long dailyMessageQuota = Long.valueOf((Integer) payload.get("dailyMessageQuota"));
 
-		Client client = new Client(name, dailyMessageQuota.longValue());
+		Client client = new Client(name, dailyMessageQuota);
 
 		clientRepository.save(client);
 
@@ -56,7 +58,7 @@ public class ClientController {
 	public @ResponseBody
 	ObjectNode removeClientWithId (@RequestBody Map<String, Object> payload){
 		ObjectNode response = mapper.createObjectNode();
-		Integer id = (Integer) payload.get("id");
+		Long id = (Long) payload.get("id");
 
 		Optional<Client> client = clientRepository.findById(id);
 
@@ -72,9 +74,9 @@ public class ClientController {
 	}
 
 	@GetMapping(path="/")
-	public @ResponseBody ObjectNode getClient (@RequestBody Map<String, Object> payload){
+	public @ResponseBody ObjectNode getClient (@RequestBody Map<String, Object> payload) throws JsonProcessingException {
 		ObjectNode response = mapper.createObjectNode();
-		Integer id = (Integer) payload.get("id");
+		Long id = Long.valueOf((Integer) payload.get("id"));
 		Optional<Client> client = clientRepository.findById(id);
 
 		if (client.isEmpty()) {
@@ -83,7 +85,10 @@ public class ClientController {
 			return response;
 		}
 
+
+		String clientNode = mapper.writeValueAsString(client);
 		response.put("status", "success");
+		response.put("data", clientNode);
 		return response;
 	}
 }
