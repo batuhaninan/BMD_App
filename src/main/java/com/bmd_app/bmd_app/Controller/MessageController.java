@@ -7,22 +7,19 @@ import com.bmd_app.bmd_app.Repository.ClientRepository;
 import com.bmd_app.bmd_app.Repository.DeliveryRepository;
 import com.bmd_app.bmd_app.Repository.RequestRepository;
 import com.bmd_app.bmd_app.Service.MessageService;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutionException;
 
 @Controller
 @RequestMapping(path="/api/message")
@@ -48,8 +45,9 @@ public class MessageController {
 
 	@PostMapping(path="/")
 	public @ResponseBody
-	ObjectNode sendMessage (@RequestBody Map<String, Object> payload) throws ParseException {
+	Object sendMessage (@RequestBody Map<String, Object> payload) throws ParseException, ExecutionException, InterruptedException {
 		ObjectNode response = mapper.createObjectNode();
+
 		Long clientId = Long.valueOf((Integer) payload.get("clientId"));
 		String senderAddress = (String) payload.get("senderAddress");
 		String messageBody = (String) payload.get("messageBody");
@@ -61,9 +59,14 @@ public class MessageController {
 
 		ArrayList<Delivery> deliveries = deliveryRepository.findAllBySingleId(clientId);
 
+		if (client.isEmpty()) {
+			response.put("status", "failed");
+			response.put("errorMessage", "Cannot find client");
+
+			return new ResponseEntity<Object>(response, HttpStatus.NOT_FOUND);
+		}
+
 		Long messageLeft = client.get().getDailyMessageQuota();
-
-
 
 		for (Delivery delivery : deliveries){
 			Date deliveryTime = delivery.getRequest().getStartTime();
@@ -76,15 +79,9 @@ public class MessageController {
 			response.put("status","failed");
 			response.put("errorMessage","maximum message length can be 1024 characters");
 
-			return response;
+			return new ResponseEntity<Object>(response, HttpStatus.NOT_FOUND);
 		}
 
-		if (client.isEmpty()) {
-			response.put("status", "failed");
-			response.put("errorMessage", "Cannot find client");
-
-			return response;
-		}
 
 		Request request = new Request();
 		request.setClient(client.get());
@@ -118,7 +115,7 @@ public class MessageController {
 				continue;
 			}
 
-			Long resultCode = Long.valueOf(messageService.call(request, delivery));
+			Long resultCode = Long.valueOf(messageService.call(request, delivery).get());
 
 
 			delivery.setResultCode(resultCode);
@@ -130,23 +127,23 @@ public class MessageController {
 		requestRepository.save(request);
 		deliveryRepository.saveAll(destinationNumbers);
 
+		response.put("clientId", client.get().getId());
+		response.put("requestId", request.getId());
+
 		if (flag){
 
 			response.put("status", "failed");
 			response.put("errorMessage","Out of quota, delivered message count: " + counter);
-			response.put("clientId", client.get().getId());
-			response.put("requestId", request.getId());
-			return response;
+
+			return new ResponseEntity<Object>(response, HttpStatus.NOT_FOUND);
 		}
 
 		response.put("status", "success");
-		response.put("clientId", client.get().getId());
-		response.put("requestId", request.getId());
-		return response;
+		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
 
 	@PutMapping(path="/cancel")
-	public @ResponseBody ObjectNode cancelDelivery (@RequestBody Map<String, Object> payload) throws ParseException{
+	public ResponseEntity<Object> cancelDelivery (@RequestBody Map<String, Object> payload) {
 
 		ObjectNode response = mapper.createObjectNode();
 
@@ -168,18 +165,16 @@ public class MessageController {
 				}
 			}
 		}
+
 		if (!requestFlag){
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid Parameter : requestId");
+			response.put("errorMessage", "Invalid Parameter : requestId");
+			return new ResponseEntity<Object>(response, HttpStatus.NOT_FOUND);
 		}
 		if (!destinationFlag){
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid Parameter : destinationNumber");
+			response.put("errorMessage", "Invalid Parameter : destinationNumber");
+			return new ResponseEntity<Object>(response, HttpStatus.NOT_FOUND);
 		}
 		response.put("status", "success");
-		return response;
-
-
-
-
+		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
-
 }
