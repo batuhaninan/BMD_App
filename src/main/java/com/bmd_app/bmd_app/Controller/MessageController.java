@@ -22,6 +22,7 @@ import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 @RequestMapping(path="/api/message")
@@ -121,6 +122,7 @@ public class MessageController {
 
 
 			delivery.setResultCode(resultCode);
+
 
 			delivery.setSuccess(resultCode <= 0);
 		}
