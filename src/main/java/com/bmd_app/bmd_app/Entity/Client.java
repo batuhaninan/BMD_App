@@ -20,8 +20,6 @@ public class Client {
 	@Column(name = "DAILYMESSAGEQUOTA")
 	private Long dailyMessageQuota;
 
-	@OneToMany(mappedBy="client", fetch=FetchType.LAZY)
-	private List<Request> requestId = new ArrayList<>();
 
 	public Client(String name, Long dailyMessageQuota) {
 		this.name = name;
@@ -56,11 +54,4 @@ public class Client {
 		this.dailyMessageQuota = dailyMessageQuota;
 	}
 
-	public List<Request> getRequestId() {
-		return requestId;
-	}
-
-	public void setRequestId(List<Request> requestId) {
-		this.requestId = requestId;
-	}
 }
