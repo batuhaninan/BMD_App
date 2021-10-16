@@ -36,10 +36,10 @@ public class QueryController {
 
 	@GetMapping(path="/count/request")
 	public @ResponseBody ObjectNode getRequestCount (@RequestBody Map<String, Object> payload) throws ParseException {
+		Hashtable<Long, Integer> requestsByClient = new Hashtable<Long, Integer>();
 		ObjectNode response = mapper.createObjectNode();
-		Date startTime = formatter.parse((String) payload.get("startTime"));;
-		Date endTime = formatter.parse((String) payload.get("endTime"));;
-		int count = 0;
+		Date startTime = formatter.parse((String) payload.get("startTime"));
+		Date endTime = formatter.parse((String) payload.get("endTime"));
 		ArrayList<Delivery> deliveries = (ArrayList<Delivery>) deliveryRepository.findAll();
 		for (Delivery delivery : deliveries){
 			if (delivery.getResultCode() == -1){
@@ -47,7 +47,9 @@ public class QueryController {
 			}
 			if (delivery.getRequest().getStartTime().after(startTime)){
 				if (endTime.after(delivery.getRequest().getEndTime())){
-					count++;
+					if (requestsByClient.get(delivery.getRequest().getClient().getId())!=null){
+						requestsByClient.put(delivery.getRequest().getClient().getId(), requestsByClient.get(delivery.getRequest().getClient().getId()+1);
+					}
 				}
 			}
 		}
@@ -100,9 +102,9 @@ public class QueryController {
 			if (delivery.getRequest().getStartTime().after(startTime)){
 				if (endTime.after(delivery.getRequest().getEndTime())){
 					if(delivery.getResultCode()!=0){ // fix request.getSuccess
-						if (Long.valueOf(delivery.getResultCode()).equals(null)){
-							continue;
-						}
+//						if (Long.valueOf(delivery.getResultCode()).equals(null)){
+//							continue;
+//						}
 						if (errors.get(delivery.getResultCode()) != null) {
 							errors.put(delivery.getResultCode(), errors.get(delivery.getResultCode()) + 1);
 						}
