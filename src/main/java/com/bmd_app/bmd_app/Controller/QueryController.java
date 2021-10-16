@@ -42,6 +42,7 @@ public class QueryController {
 		Date startTime = formatter.parse((String) payload.get("startTime"));
 		Date endTime = formatter.parse((String) payload.get("endTime"));
 		ArrayList<Delivery> deliveries = (ArrayList<Delivery>) deliveryRepository.findAll();
+		Hashtable<Long, Integer> requestsByClient = new Hashtable<Long, Integer>();
 		for (Delivery delivery : deliveries){
 			if (delivery.getResultCode() == -1){
 				continue;
@@ -49,13 +50,17 @@ public class QueryController {
 			if (delivery.getRequest().getStartTime().after(startTime)){
 				if (endTime.after(delivery.getRequest().getEndTime())){
 					if (requestsByClient.get(delivery.getRequest().getClient().getId())!=null){
-						requestsByClient.put(delivery.getRequest().getClient().getId(), requestsByClient.get(delivery.getRequest().getClient().getId()+1);
+						requestsByClient.put(delivery.getRequest().getClient().getId(), requestsByClient.get(delivery.getRequest().getClient().getId())+1);
+					}
+					else{
+						requestsByClient.put(delivery.getRequest().getClient().getId(),1);
 					}
 				}
 			}
 		}
+		JsonNode node = mapper.valueToTree(requestsByClient);
 		response.put("status","success");
-		response.put("count",count);
+		response.set("data",node);
 		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
 
