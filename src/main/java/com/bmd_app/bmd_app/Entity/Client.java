@@ -2,8 +2,6 @@ package com.bmd_app.bmd_app.Entity;
 
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "T_CLIENT")
@@ -20,10 +18,32 @@ public class Client {
 	@Column(name = "DAILYMESSAGEQUOTA")
 	private Long dailyMessageQuota;
 
+	@Column(name = "PASSWORD")
+	private String password;
+
+	@Column(name = "EMAIL")
+	private String email;
+
 
 	public Client(String name, Long dailyMessageQuota) {
 		this.name = name;
 		this.dailyMessageQuota = dailyMessageQuota;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public Client() {
