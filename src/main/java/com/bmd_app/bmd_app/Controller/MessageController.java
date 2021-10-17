@@ -128,7 +128,7 @@ public class MessageController {
 
 //				Retry every a minute
 				if (i != 2) {
-					TimeUnit.SECONDS.sleep(5);
+					TimeUnit.MINUTES.sleep(1);
 				}
 			}
 //			Long resultCode = Long.valueOf(messageService.call(request, delivery).get());
