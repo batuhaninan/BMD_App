@@ -1,0 +1,69 @@
+{
+	"info": {
+		"_postman_id": "a741243d-43fa-44f3-acc6-e8e19b17a8a7",
+		"name": "Message",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Message",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"clientId\":1,\r\n    \"senderAddress\":\"5313369595\",\r\n    \"destinationNumbers\": [\"5454023333\", \"3210839021\"],\r\n    \"messageBody\":\"Ben bir vaka ile karsi karsiya geldigimde kendime hemen su 13 soruyu sorarim. Kacta, hangi, ne ile, nicin, nolmus, kimi, nerede, nasil, ne zaman, kimden, neyi, ne belli, neye, kim?\",\r\n    \"startTime\":\"17-10-2021\",\r\n    \"endTime\":\"19-10-2021\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/message/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"message",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cancel Message",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"requestId\":3\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/message/cancel",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"message",
+						"cancel"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

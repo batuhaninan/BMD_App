@@ -1,0 +1,147 @@
+{
+	"info": {
+		"_postman_id": "e532e267-eb84-48b9-ace6-61589ca8cd6f",
+		"name": "Query",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Failed Message Count Between Two Dates",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"startTime\":\"16-10-2021\",\r\n    \"endTime\":\"20-10-2021\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/query/count/failed/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"query",
+						"count",
+						"failed",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Failed Message Count By Client Between Two Dates",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"startTime\":\"16-10-2021\",\r\n    \"endTime\":\"20-10-2021\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/query/count/failed/client",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"query",
+						"count",
+						"failed",
+						"client"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Request Count Get Between Two Dates",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"startTime\":\"16-10-2021\",\r\n    \"endTime\":\"20-10-2021\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/query/count/request",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"query",
+						"count",
+						"request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Succesful / Failed Message Count Between Two Dates",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"startTime\":\"16-10-2021\",\r\n    \"endTime\":\"20-10-2021\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/query/count/stats",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"query",
+						"count",
+						"stats"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
