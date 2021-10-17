@@ -36,19 +36,6 @@ public class ClientController {
 	@Autowired
 	ObjectMapper mapper;
 
-	@PostMapping(path="/")
-	public ResponseEntity<Object> addNewClient (@RequestBody Map<String, Object> payload){
-		ObjectNode response = mapper.createObjectNode();
-
-		String name = (String) payload.get("name");
-		Long dailyMessageQuota = Long.valueOf((Integer) payload.get("dailyMessageQuota"));
-
-		clientService.createNewClient(name, dailyMessageQuota);
-
-		response.put("status", "success");
-		return new ResponseEntity<Object>(response, HttpStatus.OK);
-	}
-
 	@DeleteMapping(path="/")
 	public ResponseEntity<Object> removeClientWithId (@RequestBody Map<String, Object> payload){
 		ObjectNode response = mapper.createObjectNode();

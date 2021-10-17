@@ -12,12 +12,6 @@ public class ClientService {
     @Autowired
     ClientRepository clientRepository;
 
-    public Client createNewClient(String name, Long dailyMessageQuota){
-        Client client = new Client(name, dailyMessageQuota);
-
-        clientRepository.save(client);
-        return client;
-    }
 
     public Boolean removeClient(Long id){
         Optional<Client> client = clientRepository.findById(id);
