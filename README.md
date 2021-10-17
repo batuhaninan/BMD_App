@@ -17,10 +17,10 @@
 
 # Postman Collections for API (endpoints)
 
-* [Auth Collection](Auth.postman_collection.json)
-* [Client Collection](Client.postman_collection.json)
-* [Message Collection](Message.postman_collection.json)
-* [Query Collection](Query.postman_collection.json)
+* [Auth Collection](Collections/Auth.postman_collection.json)
+* [Client Collection](Collections/Client.postman_collection.json)
+* [Message Collection](Collections/Message.postman_collection.json)
+* [Query Collection](Collections/Query.postman_collection.json)
 
 
 
