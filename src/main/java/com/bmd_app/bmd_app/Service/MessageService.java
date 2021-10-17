@@ -142,7 +142,7 @@ public class MessageService {
 				}
 
 				if (i != 2) {
-					TimeUnit.SECONDS.sleep(1);
+					TimeUnit.MINUTES.sleep(1);
 				}
 			}
 

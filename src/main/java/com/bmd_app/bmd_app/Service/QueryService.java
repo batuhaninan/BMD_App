@@ -114,7 +114,6 @@ public class QueryService {
                             innerMap.put(delivery.getResultCode(), 1);
                             errors.put(delivery.getRequest().getClient().getId(), innerMap);
                         }
-
                     }
                 }
             }

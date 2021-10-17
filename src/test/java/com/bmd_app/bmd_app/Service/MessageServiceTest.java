@@ -65,7 +65,7 @@ class MessageServiceTest {
         Date endTime = Date.valueOf("2021-10-20");
 
 
-        messageService.sendMessage(1L,senderAddress,destinationNumbers,messageBody,startTime,endTime, response);
+        messageService.sendMessage(client.getId(),senderAddress,destinationNumbers,messageBody,startTime,endTime, response);
         System.out.println(response.get("errorMessage"));
 
         assertEquals("\"maximum message length can be 1024 characters\"",response.get("errorMessage").toString());
