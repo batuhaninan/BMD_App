@@ -10,7 +10,7 @@
 
 #### That means you can import the project into IntelliJ and run app / test with minimal configuration
 
-#### We didn't implement the scheduling messages for later time feature
+#### We didn't implement the scheduling messages for later time feature (we tried to implement it but we couldn't finish it)
 
 #### Before you can do anything you first need to signup and that creates jwt (token)
 #### Without that token you can't access any other endpoint 

@@ -6,11 +6,14 @@ import com.bmd_app.bmd_app.Entity.Request;
 import com.bmd_app.bmd_app.Repository.ClientRepository;
 import com.bmd_app.bmd_app.Repository.DeliveryRepository;
 import com.bmd_app.bmd_app.Repository.RequestRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -19,6 +22,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @Service
+//@EnableScheduling
 public class MessageService {
 
 	MessageServiceCenter messageServiceCenter = new MessageServiceCenter();
@@ -31,6 +35,9 @@ public class MessageService {
 
 	@Autowired
 	RequestRepository requestRepository;
+
+	@Autowired
+	ObjectMapper mapper;
 
 	@Async
 	public CompletableFuture<Integer> call (Request request, Delivery delivery) {
@@ -142,7 +149,7 @@ public class MessageService {
 				}
 
 				if (i != 2) {
-					TimeUnit.MINUTES.sleep(1);
+					TimeUnit.SECONDS.sleep(1);
 				}
 			}
 
@@ -169,6 +176,25 @@ public class MessageService {
 		response.put("status", "success");
 		return 0;
 	}
+
+	/*@Scheduled(fixedRate = 30000)
+	public void scheduledMessageJob() throws ExecutionException, InterruptedException {
+			ObjectNode response = mapper.createObjectNode();
+
+			ArrayList<Delivery> deliveries = (ArrayList<Delivery>) deliveryRepository.findAll();
+
+			for (Delivery delivery : deliveries) {
+
+				if (!delivery.getSuccess() && delivery.getRequest().getStartTime().before(new Date()) && delivery.getRequest().getEndTime().after(new Date())) {
+					Request request = delivery.getRequest();
+					Client client = request.getClient();
+					ArrayList arrayList = new ArrayList();
+					arrayList.add(delivery);
+					sendMessage(client.getId(), request.getSenderAddress(), arrayList, request.getMessageBody(), request.getStartTime(), request.getEndTime(), response);
+				}
+			}
+
+	}*/
 
 
 }
