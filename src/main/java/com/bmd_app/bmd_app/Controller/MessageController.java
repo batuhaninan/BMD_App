@@ -7,6 +7,7 @@ import com.bmd_app.bmd_app.Repository.ClientRepository;
 import com.bmd_app.bmd_app.Repository.DeliveryRepository;
 import com.bmd_app.bmd_app.Repository.RequestRepository;
 import com.bmd_app.bmd_app.Service.MessageService;
+import com.bmd_app.bmd_app.Service.QueryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ import java.util.concurrent.TimeUnit;
 @Controller
 @RequestMapping(path="/api/message")
 public class MessageController {
+
+	@Autowired
+	private MessageController messageController;
 
 	@Autowired
 	ClientRepository clientRepository;
@@ -70,7 +74,6 @@ public class MessageController {
 		Long messageLeft = client.get().getDailyMessageQuota();
 
 		for (Delivery delivery : deliveries){
-			Date deliveryTime = delivery.getRequest().getStartTime();
 			if (delivery.getRequest().getStartTime().compareTo(startTime) == 0){
 				messageLeft--;
 			}
@@ -163,33 +166,21 @@ public class MessageController {
 
 		ObjectNode response = mapper.createObjectNode();
 
-		Boolean requestFlag = false;
-		Boolean destinationFlag = false;
-
 		Long requestId = Long.valueOf((Integer) payload.get("requestId"));
 		String destinationNumber = (String) payload.get("destinationNumber");
 
-		ArrayList<Delivery> deliveries = (ArrayList<Delivery>) deliveryRepository.findAll();
+		Integer result = messageService.cancelMessage(requestId, destinationNumber);
 
-		for (Delivery delivery : deliveries){
-			if (Objects.equals(delivery.getRequest().getId(), requestId)){
-				requestFlag = true;
-				if (Objects.equals(delivery.getDestinationNumber(), destinationNumber)){
-					destinationFlag = true;
-					delivery.setCancelled(true);
-					deliveryRepository.save(delivery);
-				}
-			}
-		}
-
-		if (!requestFlag){
+		if (result == 1){
 			response.put("errorMessage", "Invalid Parameter : requestId");
 			return new ResponseEntity<Object>(response, HttpStatus.NOT_FOUND);
 		}
-		if (!destinationFlag){
+
+		if (result == 2){
 			response.put("errorMessage", "Invalid Parameter : destinationNumber");
 			return new ResponseEntity<Object>(response, HttpStatus.NOT_FOUND);
 		}
+
 		response.put("status", "success");
 		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
