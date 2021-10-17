@@ -20,6 +20,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 @RequestMapping(path="/api/message")
@@ -111,11 +112,26 @@ public class MessageController {
 		}
 
 		for (Delivery delivery : destinationNumbers) {
-			if (delivery.getCancelled()){
+			if (delivery.getCancelled()) {
 				continue;
 			}
 
-			Long resultCode = Long.valueOf(messageService.call(request, delivery).get());
+			Long resultCode = null;
+
+			for (int i = 0; i < 3; i++) {
+
+				resultCode = Long.valueOf(messageService.call(request, delivery).get());
+				response.put(String.valueOf(i),resultCode);
+				if (resultCode == 0) {
+					break;
+				}
+
+//				Retry every a minute
+				if (i != 2) {
+					TimeUnit.SECONDS.sleep(5);
+				}
+			}
+//			Long resultCode = Long.valueOf(messageService.call(request, delivery).get());
 
 
 			delivery.setResultCode(resultCode);
