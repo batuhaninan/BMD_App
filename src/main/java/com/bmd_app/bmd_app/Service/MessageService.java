@@ -142,7 +142,7 @@ public class MessageService {
 				}
 
 				if (i != 2) {
-					TimeUnit.MINUTES.sleep(1);
+					TimeUnit.SECONDS.sleep(1);
 				}
 			}
 
@@ -166,7 +166,7 @@ public class MessageService {
 
 			return 1;
 		}
-
+		response.put("status", "success");
 		return 0;
 	}
 

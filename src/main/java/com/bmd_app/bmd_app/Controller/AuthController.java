@@ -131,6 +131,7 @@ public class AuthController {
 
 		response.put("status", "success");
 		response.put("token", token);
+		response.put("id",client.getId());
 		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
 

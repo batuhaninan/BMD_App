@@ -60,7 +60,6 @@ public class MessageController {
 			return new ResponseEntity<Object>(response, HttpStatus.NOT_FOUND);
 		}
 
-		response.put("status", "success");
 		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
 
