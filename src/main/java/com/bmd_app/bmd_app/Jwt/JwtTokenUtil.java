@@ -20,7 +20,6 @@ public class JwtTokenUtil {
 	private String secret;
 
 	public String getEmailFromToken(String token) {
-		System.out.println(token);
 		return getClaimFromToken(token, Claims::getSubject);
 	}
 
