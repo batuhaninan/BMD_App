@@ -8,7 +8,6 @@
 #### This app uses Spring Boot with Maven
 #### For database it uses SQLite. It stores database locally in sqlitesample.db file
 
-#### We used IntelliJ for IDE, openjdk 17 and java 16
 #### That means you can import the project into IntelliJ and run app / test with minimal configuration
 
 #### We didn't implement the scheduling messages for later time feature
