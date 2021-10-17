@@ -1,3 +1,8 @@
+# Requirements
+* IDE (IntelliJ) - Optional
+* Java 16
+* OpenJDK 17
+
 # Info
 
 #### This app uses Spring Boot with Maven
