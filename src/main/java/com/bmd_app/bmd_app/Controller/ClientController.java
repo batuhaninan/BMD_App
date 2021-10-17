@@ -4,6 +4,7 @@ import com.bmd_app.bmd_app.Entity.Client;
 import com.bmd_app.bmd_app.Repository.ClientRepository;
 import com.bmd_app.bmd_app.Repository.DeliveryRepository;
 import com.bmd_app.bmd_app.Repository.RequestRepository;
+import com.bmd_app.bmd_app.Service.ClientService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -24,6 +25,9 @@ public class ClientController {
 	ClientRepository clientRepository;
 
 	@Autowired
+	private ClientService clientService;
+
+	@Autowired
 	DeliveryRepository deliveryRepository;
 
 	@Autowired
@@ -39,9 +43,7 @@ public class ClientController {
 		String name = (String) payload.get("name");
 		Long dailyMessageQuota = Long.valueOf((Integer) payload.get("dailyMessageQuota"));
 
-		Client client = new Client(name, dailyMessageQuota);
-
-		clientRepository.save(client);
+		clientService.createNewClient(name, dailyMessageQuota);
 
 		response.put("status", "success");
 		return new ResponseEntity<Object>(response, HttpStatus.OK);
@@ -50,17 +52,16 @@ public class ClientController {
 	@DeleteMapping(path="/")
 	public ResponseEntity<Object> removeClientWithId (@RequestBody Map<String, Object> payload){
 		ObjectNode response = mapper.createObjectNode();
-		Long id = (Long) payload.get("id");
+		Long id = Long.valueOf((Integer) payload.get("id"));
+		System.out.println(id);
+		Boolean check = clientService.removeClient(id);
+		System.out.println(check);
 
-		Optional<Client> client = clientRepository.findById(id);
-
-		if (client.isEmpty()) {
-
+		if (!check) {
 			response.put("status", "failed");
 			return new ResponseEntity<Object>(response, HttpStatus.NOT_FOUND);
 		}
 
-		clientRepository.deleteById(id);
 		response.put("status", "success");
 		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
@@ -69,9 +70,10 @@ public class ClientController {
 	public ResponseEntity<Object> getClient (@RequestBody Map<String, Object> payload){
 		ObjectNode response = mapper.createObjectNode();
 		Long id = Long.valueOf((Integer) payload.get("id"));
-		Optional<Client> client = clientRepository.findById(id);
+		Optional<Client> client = clientService.getClientWithId(id);
 
-		if (client.isEmpty()) {
+
+		if (client == null) {
 
 			response.put("status", "failed");
 			return new ResponseEntity<Object>(response, HttpStatus.NOT_FOUND);
