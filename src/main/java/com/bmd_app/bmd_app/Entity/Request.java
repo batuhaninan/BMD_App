@@ -20,8 +20,6 @@ public class Request {
 	@Column(name = "MESSAGEBODY")
 	private String messageBody;
 
-
-
 	@Column(name = "STARTTIME")
 	private Date startTime;
 

@@ -46,7 +46,7 @@ public class ClientController {
 
 		if (!check) {
 			response.put("status", "failed");
-			return new ResponseEntity<Object>(response, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
 		}
 
 		response.put("status", "success");
@@ -63,7 +63,7 @@ public class ClientController {
 		if (client == null) {
 
 			response.put("status", "failed");
-			return new ResponseEntity<Object>(response, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
 		}
 
 
